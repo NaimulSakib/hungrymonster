@@ -1,13 +1,10 @@
 document.getElementById("search-btn").addEventListener("click", function () {
-    // removing warning text and hiding mealDetails section
-    showWarning("");
-    document.getElementById("meal-details").style.display = 'none';
+    // removing warning text
+    showWarning("");    
 
-    const inputMealName = document.getElementById("input-meal-name").value;
-    document.getElementById("input-meal-name").value = "";
-
+    let mealName = document.getElementById("input-meal-name").value;
     // trimming empty spaces
-    const mealName = inputMealName.trim();
+    mealName = mealName.trim();
 
     if (mealName === "") {
         showWarning("Please Enter a meal name.")
@@ -22,7 +19,14 @@ document.getElementById("search-btn").addEventListener("click", function () {
                 }
             })
     }
+    // clearing input field
+    document.getElementById("input-meal-name").value = "";
 })
+
+// Search: Enter key trigger.
+document.getElementById("input-meal-name").addEventListener("keyup", event => {
+    if (event.key === "Enter") document.getElementById("search-btn").click();
+});
 
 function showWarning(warningText) {
     document.getElementById("warning-text").innerText = warningText;
@@ -30,8 +34,9 @@ function showWarning(warningText) {
 
 
 function displayFoundMeals(meals) {
-    // clearing previous search result
+    // clearing previous search result and hiding single meal-details section
     document.getElementById("meal-list").innerHTML = "";
+    document.getElementById("meal-details").style.display = 'none';
 
     meals.forEach(meal => {
         const mealDiv = document.createElement("div");
@@ -45,8 +50,8 @@ function displayFoundMeals(meals) {
     });
 }
 
+// fetching single meal details
 function mealDetails(mealId) {
-    console.log(mealId);
     fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealId}`)
         .then(res => res.json())
         .then(data => {
@@ -54,6 +59,7 @@ function mealDetails(mealId) {
         })
 }
 
+// displaying single meal details
 function displayMealDetails(meal) {
     document.getElementById("meal-details-display").innerHTML = `
     <div class="text-center">
@@ -68,7 +74,7 @@ function displayMealDetails(meal) {
     </div>
     `;
 
-    // Displaying meals instructions.
+    // Displaying meal instructions.
     document.getElementById("instruction-display").innerHTML = `
     <p class="instructions">${meal.strInstructions}</p>
     `;
@@ -78,9 +84,7 @@ function displayMealDetails(meal) {
         let ingredient = 'strIngredient' + i;
         let quantity = 'strMeasure' + i;
 
-        if (meal[ingredient] === "" || meal[ingredient] == null) {
-            break;
-        }
+        if (meal[ingredient] === "" || meal[ingredient] == null) break;
 
         const li = document.createElement("li");
         li.innerHTML = `
